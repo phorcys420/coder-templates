@@ -111,16 +111,6 @@ resource "libvirt_domain" "main" {
     network_name = "default"
     #wait_for_lease = true
   }
-
-  # We use a XSL Transform file to modify the VM's XML definition to set the boot disk to be readonly
-  # Otherwise, cloud-init will ignore the newly modified cloud-init disk and the Coder agent will use an outdated token
-  # Also, we don't want the end users to be able to write to this
-  # NOTE: will remove this later, this actually breaks cloud-init
-  #xml {
-  #  xslt = templatefile("boot-disk-readonly.xsl", {
-  #    disk_name = libvirt_volume.boot.name
-  #  })
-  #}
 }
 
 resource "coder_metadata" "libvirt_domain_main" {
