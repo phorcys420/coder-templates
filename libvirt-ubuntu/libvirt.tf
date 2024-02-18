@@ -5,10 +5,11 @@ resource "libvirt_cloudinit_disk" "init" {
 
 data "template_file" "user_data" {
   template = templatefile("${path.module}/cloud-init/user-data.cfg", {
-    hostname           = lower(data.coder_workspace.me.name),
-    coder_agent_token  = coder_agent.main.token
+    hostname = lower(data.coder_workspace.me.name),
+    password = "coder",
     
-    coder_agent_script = base64encode(coder_agent.main.init_script)
+    coder_agent_script = base64encode(coder_agent.main.init_script),
+    coder_agent_token  = coder_agent.main.token
   })
 }
 
