@@ -1,7 +1,6 @@
 resource "libvirt_cloudinit_disk" "init" {
   name           = lower("coder-${data.coder_workspace.me.owner}-${data.coder_workspace.me.name}-cloudinit.iso")
   user_data      = data.template_file.user_data.rendered
-  network_config = data.template_file.network_config.rendered
 }
 
 data "template_file" "user_data" {
