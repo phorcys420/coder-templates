@@ -12,10 +12,6 @@ data "template_file" "user_data" {
   })
 }
 
-data "template_file" "network_config" {
-  template = file("${path.module}/cloud-init/network-config.cfg")
-}
-
 resource "coder_metadata" "libvirt_cloudinit_disk_init" {
   resource_id = libvirt_cloudinit_disk.init.id
   hide        = true
