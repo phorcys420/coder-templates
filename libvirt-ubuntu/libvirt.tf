@@ -122,7 +122,8 @@ resource "libvirt_domain" "main" {
 
   network_interface {
     network_name = "default"
-    #wait_for_lease = true
+    # we wait for the VM to be granted a DHCP lease so that Coder doesn't start waiting for the agent too early
+    wait_for_lease = true
   }
 }
 
