@@ -84,13 +84,13 @@ resource "coder_metadata" "libvirt_volume_home" {
 # ---
 
 resource "libvirt_domain" "main" {
-  name       = lower("coder-${data.coder_workspace.me.owner}-${data.coder_workspace.me.name}")
-  count      = data.coder_workspace.me.start_count
-  memory     = data.coder_parameter.ram_amount.value
-  vcpu       = data.coder_parameter.cpu_count.value
-  qemu_agent = false # TODO: get this to work (maybe)
+  name  = lower("coder-${data.coder_workspace.me.owner}-${data.coder_workspace.me.name}")
+  count = data.coder_workspace.me.start_count
+
+  memory = data.coder_parameter.ram_amount.value
+  vcpu   = data.coder_parameter.cpu_count.value
   
-  cloudinit  = libvirt_cloudinit_disk.init.id
+  cloudinit = libvirt_cloudinit_disk.init.id
 
   disk {
     volume_id = libvirt_volume.root[0].id
