@@ -49,7 +49,7 @@ resource "libvirt_volume" "root" {
   format = "qcow2"
   pool   = local.pools.temp
 
-  base_volume_name = "ubuntu"
+  base_volume_name = libvirt_volume.boot.name
   base_volume_pool = local.pools.images
 }
 
