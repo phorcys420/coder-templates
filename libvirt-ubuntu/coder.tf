@@ -1,8 +1,8 @@
 data "coder_workspace" "me" {}
 
 resource "coder_agent" "main" {
-  os           = "linux"
-  arch         = "amd64"
+  os   = "linux"
+  arch = "amd64"
 
   metadata {
     key          = "cpu"
