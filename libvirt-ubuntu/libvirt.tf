@@ -1,3 +1,11 @@
+locals {
+  pools = {
+    images = libvirt_pool.coder-imgs.name
+    data   = libvirt_pool.coder-data.name
+    temp   = "default"
+  }
+}
+
 resource "libvirt_cloudinit_disk" "init" {
   name           = lower("coder-${data.coder_workspace.me.owner}-${data.coder_workspace.me.name}-cloudinit.iso")
   user_data      = data.template_file.user_data.rendered
@@ -20,39 +28,50 @@ resource "coder_metadata" "libvirt_cloudinit_disk_init" {
 
 # ---
 
-resource "libvirt_pool" "coder" {
-  name = "coder-${data.coder_workspace.me.owner}-${data.coder_workspace.me.name}"
+resource "libvirt_pool" "coder-imgs" {
+  name = "coder-imgs-${data.coder_workspace.me.owner}-${data.coder_workspace.me.name}"
   type = "dir"
-  path = "/tmp/terraform-provider-libvirt-pool-coder-${data.coder_workspace.me.owner}-${data.coder_workspace.me.name}"
+  path = "/tmp/terraform-provider-libvirt-pool-coder-imgs-${data.coder_workspace.me.owner}-${data.coder_workspace.me.name}"
 }
 
 resource "libvirt_volume" "boot" {
-  name   = "ubuntu-qcow2"
-  pool   = libvirt_pool.coder.name
+  name   = "ubuntu"
   source = "https://cloud-images.ubuntu.com/releases/23.10/release/ubuntu-23.10-server-cloudimg-amd64.img"
+
   format = "qcow2"
+  pool   = local.pools.images
 }
 
-#resource "libvirt_volume" "root" {
-#  name             = lower("coder-${data.coder_workspace.me.owner}-${data.coder_workspace.me.name}.qcow2")
-#  count            = data.coder_workspace.me./tmp/terraform-provider-libvirt-pool-coderstart_count
-#  format           = "qcow2"
-#  base_volume_name = "${data.coder_parameter.baseline_image.value}.qcow2"
-#  base_volume_pool = "baselines"
-#}
+resource "libvirt_volume" "root" {
+  name  = lower("coder-${data.coder_workspace.me.owner}-${data.coder_workspace.me.name}-root.qcow2")
+  count = data.coder_workspace.me.start_count
 
-#resource "coder_metadata" "libvirt_volume_root" {
-#  count       = data.coder_workspace.me.start_count
-#  resource_id = libvirt_volume.root[0].id
-#  hide        = true
-#}
+  format = "qcow2"
+  pool   = local.pools.temp
+
+  base_volume_name = "ubuntu"
+  base_volume_pool = local.pools.images
+}
+
+resource "coder_metadata" "libvirt_volume_root" {
+  count       = data.coder_workspace.me.start_count
+  resource_id = libvirt_volume.root[0].id
+  hide        = true
+}
 
 # ---
 
+resource "libvirt_pool" "coder-data" {
+  name = "coder-data-${data.coder_workspace.me.owner}-${data.coder_workspace.me.name}"
+  type = "dir"
+  path = "/tmp/terraform-provider-libvirt-pool-coder-data-${data.coder_workspace.me.owner}-${data.coder_workspace.me.name}"
+}
+
 resource "libvirt_volume" "home" {
-  name   = lower("coder-${data.coder_workspace.me.owner}-${data.coder_workspace.me.name}.home.qcow2")
+  name = lower("coder-${data.coder_workspace.me.owner}-${data.coder_workspace.me.name}-home.qcow2")
+
   format = "qcow2"
-  pool   = libvirt_pool.coder.name
+  pool   = libvirt_pool.coder-data.name
 
   size = 20 * pow(1024, 3) # 20 Gigabytes to 21474836480 Bytes
 }
@@ -74,7 +93,7 @@ resource "libvirt_domain" "main" {
   cloudinit  = libvirt_cloudinit_disk.init.id
 
   disk {
-    volume_id = libvirt_volume.boot.id
+    volume_id = libvirt_volume.root[0].id
   }
 
   disk {
@@ -84,12 +103,6 @@ resource "libvirt_domain" "main" {
   boot_device {
     dev = [ "hd" ]
   }
-
-  #filesystem {
-  #  source  = "/var/lib/libvirt/shares/coder-${lower(data.coder_workspace.me.owner)}-${lower(data.coder_workspace.me.name)}"
-  #  target  = "out"
-  #  readonly = false
-  #}
 
   # TODO: see if this is still the case as this was copied from the example template for the libvirt provider
   # IMPORTANT: this is a known bug on cloud images, since they expect a console
