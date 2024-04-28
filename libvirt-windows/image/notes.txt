@@ -1,0 +1,15 @@
+https://developer.hashicorp.com/packer/integrations/hashicorp/qemu/latest/components/builder/qemu
+https://developer.hashicorp.com/packer/integrations/hashicorp/qemu/latest/components/builder/qemu#cd-configuration 
+
+https://actuated.dev/blog/automate-packer-qemu-image-builds
+
+https://developer.hashicorp.com/packer/docs/communicators/winrm
+https://github.com/quentinnoilou/packer-vsphere/blob/main/windows_server_2022/windows2022.pkr.hcl
+
+---
+
+https://leduccc.medium.com/improving-the-performance-of-a-windows-10-guest-on-qemu-a5b3f54d9cf5
+https://pve.proxmox.com/wiki/Windows_10_guest_best_practices
+https://benheater.com/proxmox-lab-windows-guest-best-practices/
+
+should be able to load drivers for virtio disk within WinPE env using pnputil

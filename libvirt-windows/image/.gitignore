@@ -1,0 +1,6 @@
+*.iso
+
+drivers/**
+!drivers/.gitkeep
+output/**
+packer_cache/**
