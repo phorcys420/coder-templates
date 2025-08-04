@@ -1,7 +1,8 @@
 terraform {
   required_providers {
     coder = {
-      source = "coder/coder"
+      source  = "coder/coder"
+      version = "~> 2.8.0"
     }
     docker = {
       source = "kreuzwerker/docker"
@@ -9,16 +10,13 @@ terraform {
   }
 }
 
-locals {
-  enable_subdomains = false
-
-  username = data.coder_workspace.me.owner
-}
-
 data "coder_provisioner" "me" {}
 data "coder_workspace" "me" {}
+data "coder_workspace_owner" "me" {}
 
-provider "docker" {}
+provider "docker" {
+  host = "tcp://katerose-fsn-cdr-dev.tailscale.svc.cluster.local:2375"
+}
 
 resource "coder_agent" "main" {
   arch           = data.coder_provisioner.me.arch
@@ -31,39 +29,8 @@ resource "coder_agent" "main" {
       cp -rT /etc/skel ~
       touch ~/.init_done
     fi
-
-    # install and start code-server
-    echo "[+] Installing code-server"
-    curl -fsSL https://code-server.dev/install.sh | sh -s -- --method=standalone --prefix=/tmp/code-server --version 4.19.1
-    /tmp/code-server/bin/code-server --auth none --port 13337 >/tmp/code-server.log 2>&1 &
-
-    echo "[+] Installing noVNC"
-    sudo apt update -y
-    sudo apt install -y websockify && git clone https://github.com/novnc/noVNC && mv noVNC/vnc.html noVNC/index.html
-
-    echo "[+] Starting noVNC"
-    websockify 8080 localhost:5900 --web "$HOME/noVNC" >/tmp/novnc.log 2>&1 &
-
-    echo "[+] Creating Android VM"
-    avdmanager -v create avd -n 'coder' -d 'pixel_5' -k 'system-images;android-34;google_apis_playstore;x86_64'
-
-    echo "[+] Starting Android VM"
-    emulator -avd coder -no-window #>/tmp/android-emulator.log 2>&1 &
-
-    #adb wait-for-device
-    #echo "[+] Android VM is ready !"
   EOT
 
-  # These environment variables allow you to make Git commits right away after creating a
-  # workspace. Note that they take precedence over configuration defined in ~/.gitconfig!
-  # You can remove this block if you'd prefer to configure Git manually or using
-  # dotfiles. (see docs/dotfiles.md)
-  env = {
-    GIT_AUTHOR_NAME     = coalesce(data.coder_workspace.me.owner_name, data.coder_workspace.me.owner)
-    GIT_AUTHOR_EMAIL    = "${data.coder_workspace.me.owner_email}"
-    GIT_COMMITTER_NAME  = coalesce(data.coder_workspace.me.owner_name, data.coder_workspace.me.owner)
-    GIT_COMMITTER_EMAIL = "${data.coder_workspace.me.owner_email}"
-  }
 
   # The following metadata blocks are optional. They are used to display
   # information about your workspace in the dashboard. You can remove them
@@ -132,56 +99,6 @@ resource "coder_agent" "main" {
   }
 }
 
-resource "coder_app" "novnc" {
-  agent_id     = coder_agent.main.id
-
-  display_name = "noVNC"
-  slug         = "novnc"
-  icon     = "/icon/novnc.svg"
-
-  url      = "http://localhost:8080?autoconnect=1&resize=scale&show_dot=1&path=@${data.coder_workspace.me.owner}/${data.coder_workspace.me.name}.dev/apps/novnc/websockify&password=supersecure"
-
-  subdomain  = local.enable_subdomains
-  share      = "owner"
-
-  order = 1
-}
-
-resource "coder_app" "adb-shell" {
-  agent_id     = coder_agent.main.id
-
-  display_name = "ADB Shell"
-  slug         = "adb-shell"
-
-  command = "adb shell"
-
-  order = 2
-
-  subdomain = false
-  share     = "owner"
-}
-
-resource "coder_app" "code-server" {
-  agent_id     = coder_agent.main.id
-
-  display_name = "code-server"
-  slug         = "code-server"
-  icon         = "/icon/code.svg"
-
-  url = "http://localhost:13337/?folder=/home/${local.username}"
-
-  subdomain  = false
-  share      = "owner"
-
-  order = 3
-
-  healthcheck {
-    url       = "http://localhost:13337/healthz"
-    interval  = 5
-    threshold = 6
-  }
-}
-
 resource "docker_volume" "home_volume" {
   name = "coder-${data.coder_workspace.me.id}-home"
   
@@ -193,12 +110,12 @@ resource "docker_volume" "home_volume" {
   # Add labels in Docker to keep track of orphan resources.
   labels {
     label = "coder.owner"
-    value = data.coder_workspace.me.owner
+    value = lower(data.coder_workspace_owner.me.name)
   }
 
   labels {
     label = "coder.owner_id"
-    value = data.coder_workspace.me.owner_id
+    value = data.coder_workspace_owner.me.id
   }
 
   labels {
@@ -219,9 +136,6 @@ resource "docker_image" "main" {
 
   build {
     context = "./build"
-    build_args = {
-      USER = local.username
-    }
   }
 
   triggers = {
@@ -233,7 +147,7 @@ resource "docker_container" "workspace" {
   count = data.coder_workspace.me.start_count
   image = docker_image.main.name
   # Uses lower() to avoid Docker restriction on container names.
-  name = "coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}"
+  name = "coder-${lower(data.coder_workspace_owner.me.name)}-${lower(data.coder_workspace.me.name)}"
   # Hostname makes the shell more user friendly: coder@my-workspace:~$
   hostname = data.coder_workspace.me.name
   # Use the docker gateway if the access URL is 127.0.0.1
@@ -246,7 +160,7 @@ resource "docker_container" "workspace" {
   }
 
   volumes {
-    container_path = "/home/${local.username}"
+    container_path = "/home/coder"
     volume_name    = docker_volume.home_volume.name
     read_only      = false
   }
@@ -259,12 +173,12 @@ resource "docker_container" "workspace" {
   # Add labels in Docker to keep track of orphan resources.
   labels {
     label = "coder.owner"
-    value = data.coder_workspace.me.owner
+    value = lower(data.coder_workspace_owner.me.name)
   }
 
   labels {
     label = "coder.owner_id"
-    value = data.coder_workspace.me.owner_id
+    value = data.coder_workspace_owner.me.id
   }
 
   labels {
@@ -276,4 +190,57 @@ resource "docker_container" "workspace" {
     label = "coder.workspace_name"
     value = data.coder_workspace.me.name
   }
+}
+
+module "git-config" {
+  count = data.coder_workspace.me.start_count
+
+  source  = "registry.coder.com/coder/git-config/coder"
+  version = "1.0.15"
+
+  agent_id = coder_agent.main.id
+}
+
+module "vscode-web" {
+  count = data.coder_workspace.me.start_count
+
+  source  = "registry.coder.com/coder/vscode-web/coder"
+  version = "1.3.0"
+
+  accept_license = true
+
+  agent_id = coder_agent.main.id
+}
+
+module "android-vm" {
+  count = data.coder_workspace.me.start_count
+
+  source  = "./modules/android-vm"
+
+  android_device = "pixel_5"
+  android_image  = "system-images;android-34;google_apis_playstore;x86_64"
+
+  agent_id = coder_agent.main.id
+}
+
+module "droidvnc" {
+  count = data.coder_workspace.me.start_count
+
+  source  = "./modules/droidvnc"
+
+  agent_id = coder_agent.main.id
+}
+
+module "novnc" {
+  count = data.coder_workspace.me.start_count
+
+  source  = "./modules/novnc"
+
+  listen_host = "localhost:8080"
+  host_to_proxy = "localhost:5900" # TODO: explain
+  settings = "?autoconnect=1&resize=scale&show_dot=1&password=supersecure"
+
+  coder_app_display_name = "Android VM screen"
+
+  agent_id = coder_agent.main.id
 }

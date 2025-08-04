@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 packageName='net.christianbeier.droidvnc_ng'
@@ -14,13 +14,15 @@ curl "https://f-droid.org/repo/$apkName" -o "$apkPath"
 echo "[+] Waiting for device..."
 adb wait-for-device
 
-# TODO fix tmis
 echo "[+] Waiting for device to be ready..."
-while [ $(adb shell getprop sys.boot_completed) != "1" ]; do
-    echo "[DEBUG] not ready"
+until [ "$(adb shell getprop sys.boot_completed)" == "1" ]; do
+    #: # do nothing: just wait
+    echo "[DEBUG] boot is not completed"
 done
 
 adb shell input keyevent 0
+sleep 15 # TODO: remove
+echo "[+] Device is ready"
 
 echo "[+] Installing droidVNC-NG apk"
 adb install "$apkPath"
@@ -30,9 +32,8 @@ EXTERNAL_STORAGE="/storage/emulated/0"
 echo "[+] Writing default droidVNC-NG config"
 adb shell mkdir -p "$EXTERNAL_STORAGE/Android/data/$packageName/files"
 
-# TODO : better
-
-# TODO : explain why no cursor
+# TODO : better way to write this file
+# TODO : explain why no cursor (TLDR: laggy)
 cat << EOF > /tmp/droidvnc_default.json
 {
     "port": 5900,
@@ -65,5 +66,6 @@ adb shell am start-foreground-service \
  --ei $packageName.EXTRA_PORT 5900 \
  --ez $packageName.EXTRA_VIEW_ONLY false
 
-echo "[+] forward tcp:5900 tcp:5900"
-adb forward tcp:5900 tcp:5900
+echo "[+] Forwarding the necessary ports to the host workspace"
+adb forward tcp:5900 tcp:5900 # VNC Server
+adb forward tcp:5800 tcp:5800 # built-in noVNC viewer

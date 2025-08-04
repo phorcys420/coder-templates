@@ -56,7 +56,9 @@ RUN chmod 755 "$ANDROID_HOME" -R
 ENV PATH="${PATH}:${ANDROID_HOME}/emulator:${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/platform-tools"
 
 # Add the "coder" user to the "kvm" group to allow it to use the /dev/kvm device
-RUN groupadd -r kvm -g 109 && \
+RUN groupadd -r kvm -g 108 && \
     usermod -aG kvm coder
+
+COPY --chmod=775 install-droidvnc.sh /usr/local/bin/install-droidvnc.sh
 
 USER coder
