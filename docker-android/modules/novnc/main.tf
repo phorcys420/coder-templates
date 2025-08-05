@@ -40,8 +40,8 @@ resource "coder_script" "android-emulator" {
   icon         = "/icon/novnc.svg"
 
   script = templatefile("${path.module}/run.sh", {
-    NOVNC_LISTEN_HOST = var.listen_host,
-    NOVNC_HOST_TO_PROXY= var.host_to_proxy
+    NOVNC_LISTEN_HOST   = var.listen_host,
+    NOVNC_HOST_TO_PROXY = var.host_to_proxy
   })
 
   run_on_start = true
@@ -54,7 +54,7 @@ resource "coder_app" "novnc" {
   slug         = "novnc"
   icon         = "/icon/novnc.svg"
 
-  url = "http://${var.listen_host}/${var.settings}"
+  url = "http://${var.listen_host}/${var.coder_app_uri_parameters}"
 
   # TODO: make variable for those
   share     = "owner"
