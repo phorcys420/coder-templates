@@ -11,6 +11,13 @@ apkPath="/tmp/$apkName"
 echo "[+] Downloading droidVNC-NG apk"
 curl "https://f-droid.org/repo/$apkName" -o "$apkPath"
 
+echo "[+] Waiting for ADB daemon..."
+
+until pgrep -x "adb" > /dev/null; do
+    : # do nothing: just wait
+    #echo "[DEBUG] Still waiting for ADB daemon..."
+done
+
 echo "[+] Waiting for device..."
 adb wait-for-device
 

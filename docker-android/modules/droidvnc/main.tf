@@ -18,16 +18,7 @@ resource "coder_script" "droidvnc" {
   display_name = "droidVNC"
   icon         = "/emojis/1f4f1.png"
   
-  script = <<EOT
-    echo "Waiting for ADB daemon..."
-
-    until pgrep -x "adb" > /dev/null; do
-      : # do nothing: just wait
-      #echo "[DEBUG] Still waiting for ADB daemon..."
-    done
-
-    install-droidvnc.sh
-  EOT
+  script = file("${path.module}/install-droidvnc.sh")
 
   run_on_start = true
   start_blocks_login = false

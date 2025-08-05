@@ -59,6 +59,4 @@ ENV PATH="${PATH}:${ANDROID_HOME}/emulator:${ANDROID_HOME}/tools:${ANDROID_HOME}
 RUN groupadd -r kvm -g 108 && \
     usermod -aG kvm coder
 
-COPY --chmod=775 install-droidvnc.sh /usr/local/bin/install-droidvnc.sh
-
 USER coder
