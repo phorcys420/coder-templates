@@ -236,11 +236,11 @@ module "novnc" {
 
   source  = "./modules/novnc"
 
-  listen_host = "localhost:8080"
+  listen_host   = "localhost:8080"
   host_to_proxy = "localhost:5900" # TODO: explain
-  settings = "?autoconnect=1&resize=scale&show_dot=1&password=supersecure"
 
-  coder_app_display_name = "Android VM screen"
+  coder_app_display_name   = "Android VM screen"
+  coder_app_uri_parameters = "?autoconnect=1&resize=scale&show_dot=1&password=supersecure"
 
   agent_id = coder_agent.main.id
 }

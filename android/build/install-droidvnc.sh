@@ -56,6 +56,10 @@ adb shell pm grant $packageName android.permission.POST_NOTIFICATIONS
 echo "[+] Allow droidVNC-NG to project media (capture the screen)"
 adb shell appops set $packageName PROJECT_MEDIA allow
 
+# Arbitrary sleep to avoid a theoretical race condition
+sleep 1
+
+# TODO: find a way to get a return or something because sometimes it straight up does nothing
 echo "[+] Starting droidVNC-NG..."
 adb shell am start-foreground-service \
  -n $packageName/.MainService \
