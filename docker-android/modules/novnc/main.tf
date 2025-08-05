@@ -22,7 +22,7 @@ variable "host_to_proxy" {
   description = ""
 }
 
-variable "settings" {
+variable "coder_app_uri_parameters" {
   type        = string
   description = "URI query parameters for noVNC."
   default = "?resize=scale&show_dot=1"
