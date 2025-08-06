@@ -15,7 +15,7 @@ jobs:
         template: [docker-android]
     
     env:
-      IMAGE_NAME: ${{ matrix.image }}-env
+      IMAGE_NAME: ${{ matrix.template }}-env
 
     steps:
       - name: Checkout
