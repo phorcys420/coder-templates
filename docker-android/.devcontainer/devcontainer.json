@@ -29,7 +29,7 @@
     //"ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
 
-  "onCreateCommand": {
+  "postCreateCommand": {
     // This doesn't matter because the GID might be wrong, so we'll just use a workaround in the install-droidvnc.sh script
     // TODO: experiment onAttachCommand behavior when building to docker image
     //"kvm-groups": "sudo groupadd -r kvm -g 108 && sudo usermod -aG kvm coder",
