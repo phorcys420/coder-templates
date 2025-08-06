@@ -10,6 +10,10 @@ jobs:
   build:
     # https://github.com/uwu/basic-env/blob/59d7e8d9b0328ffa59654eb8de79f200a930fcd6/.github/workflows/build-and-push-others.yml
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
     strategy:
       matrix:
         template: [docker-android]
