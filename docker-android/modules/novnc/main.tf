@@ -14,12 +14,13 @@ variable "agent_id" {
 
 variable "listen_host" {
   type        = string
-  description = ""
+  description = "The host noVNC (websockify) should be listening on."
+  default     = "localhost:8080"
 }
 
 variable "host_to_proxy" {
   type        = string
-  description = ""
+  description = "The VNC server noVNC (websockify) should be proxying and displaying var.listen_host."
 }
 
 variable "coder_app_uri_parameters" {
@@ -32,6 +33,18 @@ variable "coder_app_display_name" {
   type        = string
   description = ""
   default     = "noVNC"
+}
+
+variable "coder_app_slug" {
+  type        = string
+  description = ""
+  default     = "novnc"
+}
+
+variable "coder_app_share" {
+  type        = string
+  description = ""
+  default     = "owner"
 }
 
 resource "coder_script" "novnc" {
@@ -51,14 +64,13 @@ resource "coder_app" "novnc" {
   agent_id     = var.agent_id
 
   display_name = var.coder_app_display_name
-  slug         = "novnc"
+  slug         = var.coder_app_slug
   icon         = "/icon/novnc.svg"
 
   url = "http://${var.listen_host}/${var.coder_app_uri_parameters}"
 
   # TODO: make variable for those
-  share     = "owner"
-  subdomain = true
+  share     = var.coder_app_share
 
   order = 3
 

@@ -224,7 +224,6 @@ module "novnc" {
 
   source  = "./modules/novnc"
 
-  listen_host   = "localhost:8080"
   host_to_proxy = "localhost:5900" # TODO: explain
 
   coder_app_display_name   = "Android VM screen"

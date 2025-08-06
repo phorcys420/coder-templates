@@ -26,7 +26,6 @@ until [ "$(adb shell getprop sys.boot_completed)" == "1" ]; do
 done
 
 adb shell input keyevent 0
-#sleep 15 # TODO: remove
 echo "[+] Device is ready"
 
 echo "[+] Installing droidVNC-NG apk"
@@ -37,8 +36,11 @@ EXTERNAL_STORAGE="/storage/emulated/0"
 echo "[+] Writing default droidVNC-NG config"
 adb shell mkdir -p "$EXTERNAL_STORAGE/Android/data/$packageName/files"
 
-# TODO : better way to write this file
-# TODO : explain why no cursor (TLDR: laggy)
+# TODO: better way to write this file
+# TODO: explain why no cursor (TLDR: laggy)
+# TODO: random password
+# TODO: make port configureable
+# While startOnBoot could be useful if the VM is persisted, we currently don't support persisted VMs
 cat << EOF > /tmp/droidvnc_default.json
 {
     "port": 5900,
