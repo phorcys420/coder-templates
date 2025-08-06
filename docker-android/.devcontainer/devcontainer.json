@@ -22,6 +22,10 @@
       "installMavenRepos": true,
       "installPlayServices": true,
       "installEmulator": true
+    },
+
+    "./features/android-vm": {
+      "androidImage": "system-images;android-34;google_apis_playstore;x86_64"
     }
 
     // These features have not been included for the sake of keeping the template "light", but feel free to add them back:
