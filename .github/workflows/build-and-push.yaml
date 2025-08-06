@@ -16,7 +16,6 @@ jobs:
     
     env:
       IMAGE_NAME: ${{ matrix.image }}-env
-      IMAGE_PATH: ghcr.io/${{ github.repository }}/${{ env.IMAGE_NAME }}
 
     steps:
       - name: Checkout
@@ -38,3 +37,5 @@ jobs:
           imageName: ${{ env.IMAGE_PATH }}
           cacheFrom: ${{ env.IMAGE_PATH }}
           push: ${{ github.event_name != 'pull_request' && 'always' || 'never' }}
+        env:
+          IMAGE_PATH: ghcr.io/${{ github.repository }}/${{ env.IMAGE_NAME }}
