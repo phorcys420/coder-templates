@@ -1,0 +1,18 @@
+{
+  "name": "Android VM (via sdkmanager)",
+  "id": "android-vm",
+  "version": "1.0.0",
+  "description": "A feature that installs an android VM image.",
+  "keywords": ["android", "mobile", "mobile-development"],
+  "options": {
+    "androidImage": {
+      "type": "string",
+      "default": "system-images;android-34;google_apis_playstore;x86_64",
+      "description": "Select the Android VM version"
+    }
+  },
+
+  "dependsOn": {
+    "ghcr.io/phorcys420/devcontainer-features/android-sdk:1": {}
+  }
+}

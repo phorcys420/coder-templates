@@ -27,17 +27,11 @@
     // These features have not been included for the sake of keeping the template "light", but feel free to add them back:
     //"ghcr.io/devcontainers-extra/features/gradle-sdkman:2": {},
     //"ghcr.io/devcontainers/features/docker-in-docker:2": {}
-  },
+  }
 
-  "postCreateCommand": {
+  /*"postCreateCommand": {
     // This doesn't matter because the GID might be wrong, so we'll just use a workaround in the install-droidvnc.sh script
     // TODO: experiment onAttachCommand behavior when building to docker image
-    //"kvm-groups": "sudo groupadd -r kvm -g 108 && sudo usermod -aG kvm coder",
-
-    // Install Android platforms and system images
-    // TODO: move this into an android-vm feature
-    // TODO: explain diff between google_apis and google_apis_playstore
-    // TODO: see how we can make this a dynamic parameter/preset thing
-    "android-image": "sudo --preserve-env=PATH env sdkmanager 'platforms;android-34' 'system-images;android-34;google_apis_playstore;x86_64'"
-  }
+    "kvm-groups": "sudo groupadd -r kvm -g 108 && sudo usermod -aG kvm coder",
+  }*/
 }
