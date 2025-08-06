@@ -34,7 +34,7 @@ variable "coder_app_display_name" {
   default     = "noVNC"
 }
 
-resource "coder_script" "android-emulator" {
+resource "coder_script" "novnc" {
   agent_id     = var.agent_id
   display_name = "noVNC"
   icon         = "/icon/novnc.svg"

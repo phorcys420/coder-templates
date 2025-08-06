@@ -15,7 +15,6 @@ echo "[+] Waiting for ADB daemon..."
 
 until pgrep -x "adb" > /dev/null; do
     : # do nothing: just wait
-    #echo "[DEBUG] Still waiting for ADB daemon..."
 done
 
 echo "[+] Waiting for device..."
@@ -23,12 +22,11 @@ adb wait-for-device
 
 echo "[+] Waiting for device to be ready..."
 until [ "$(adb shell getprop sys.boot_completed)" == "1" ]; do
-    #: # do nothing: just wait
-    echo "[DEBUG] boot is not completed"
+    : # do nothing: just wait
 done
 
 adb shell input keyevent 0
-sleep 15 # TODO: remove
+#sleep 15 # TODO: remove
 echo "[+] Device is ready"
 
 echo "[+] Installing droidVNC-NG apk"
@@ -63,7 +61,7 @@ adb shell pm grant $packageName android.permission.POST_NOTIFICATIONS
 echo "[+] Allow droidVNC-NG to project media (capture the screen)"
 adb shell appops set $packageName PROJECT_MEDIA allow
 
-# Arbitrary sleep to avoid a theoretical race condition
+# Arbitrary sleep to avoid a race condition
 sleep 1
 
 # TODO: find a way to get a return or something because sometimes it straight up does nothing
