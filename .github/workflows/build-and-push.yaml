@@ -39,7 +39,7 @@ jobs:
         with:
           subFolder: ${{ matrix.template }}
           imageName: ${{ env.IMAGE_PATH }}
-          cacheFrom: ${{ env.IMAGE_PATH }}
+          #cacheFrom: ${{ env.IMAGE_PATH }}
           push: ${{ github.event_name != 'pull_request' && 'always' || 'never' }}
         env:
           IMAGE_PATH: ghcr.io/${{ github.repository }}/${{ env.IMAGE_NAME }}
