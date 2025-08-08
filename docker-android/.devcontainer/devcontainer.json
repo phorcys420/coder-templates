@@ -1,5 +1,7 @@
 {
-  "image": "codercom/enterprise-base:latest",
+  "build": {
+    "dockerfile": "./Dockerfile",
+  },
 
   "name": "Android in Docker",
   
@@ -18,15 +20,11 @@
   },
 
   "features": {
-    "ghcr.io/phorcys420/devcontainer-features/android-sdk:1": {
+    /*"ghcr.io/phorcys420/devcontainer-features/android-sdk:1": {
       "installMavenRepos": true,
       "installPlayServices": true,
       "installEmulator": true
-    },
-
-    "./features/android-vm": {
-      "androidImage": "system-images;android-34;google_apis_playstore;x86_64"
-    }
+    }*/
 
     // These features have not been included for the sake of keeping the template "light", but feel free to add them back:
     //"ghcr.io/devcontainers-extra/features/gradle-sdkman:2": {},

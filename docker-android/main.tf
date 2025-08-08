@@ -206,7 +206,7 @@ module "android-vm" {
   source  = "./modules/android-vm"
 
   android_device = "pixel_5"
-  android_image  = "system-images;android-34;google_apis_playstore;x86_64"
+  android_image  = "system-images;android-34;google_apis_playstore;x86_64" # TODO: autodetect, and maybe make this a preset
 
   agent_id = coder_agent.main.id
 }
