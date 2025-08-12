@@ -69,10 +69,11 @@ resource "coder_app" "novnc" {
 
   url = "http://${var.listen_host}/${var.coder_app_uri_parameters}"
 
-  # TODO: make variable for those
-  share     = var.coder_app_share
-
+  # TODO: make variable for these
+  share = var.coder_app_share
   order = 3
+
+  subdomain = true
 
   healthcheck {
     url       = "http://${var.listen_host}/"

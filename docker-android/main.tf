@@ -133,7 +133,7 @@ resource "docker_volume" "home_volume" {
 
 resource "docker_container" "workspace" {
   count = data.coder_workspace.me.start_count
-  image = "ghcr.io/phorcys420/coder-templates/docker-android-env"
+  image = "ghcr.io/phorcys420/coder-templates/docker-android-env@sha256:35e00111ab49985c68635b6df75d786327d59ba4566124b2b9066a798464c9f4"
   # Uses lower() to avoid Docker restriction on container names.
   name = "coder-${lower(data.coder_workspace_owner.me.name)}-${lower(data.coder_workspace.me.name)}"
   # Hostname makes the shell more user friendly: coder@my-workspace:~$
@@ -228,6 +228,14 @@ module "novnc" {
 
   coder_app_display_name   = "Android VM screen"
   coder_app_uri_parameters = "?autoconnect=1&resize=scale&show_dot=1&password=supersecure"
+
+  agent_id = coder_agent.main.id
+}
+
+module "adb-tools" {
+  count = data.coder_workspace.me.start_count
+
+  source  = "./modules/adb-tools"
 
   agent_id = coder_agent.main.id
 }

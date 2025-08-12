@@ -43,5 +43,5 @@ resource "coder_app" "novnc2" {
     threshold = 6
   }
 
-  order = 4
+  order = 5
 }
